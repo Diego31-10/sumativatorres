@@ -21,9 +21,35 @@ export default function RootLayout() {
             }} 
           />
           <Stack.Screen 
+            name="tasks/index" 
+            options={{ 
+              title: 'Mis Tareas',
+              headerStyle: {
+                backgroundColor: '#3b82f6',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }} 
+          />
+          <Stack.Screen 
             name="tasks/new" 
             options={{ 
               title: 'Nueva Tarea',
+              headerStyle: {
+                backgroundColor: '#3b82f6',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }} 
+          />
+          <Stack.Screen 
+            name="tasks/[id]" 
+            options={{ 
+              title: 'Detalle de Tarea',
               headerStyle: {
                 backgroundColor: '#3b82f6',
               },

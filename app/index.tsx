@@ -13,11 +13,19 @@ export default function Index() {
         Gestión inteligente de tareas
       </Text>
       
-      <View className="w-full">
+      <View className="w-full space-y-3">
         <Button
-          title="Crear Nueva Tarea"
-          onPress={() => router.push('/tasks/new')}
+          title="Ver Mis Tareas"
+          onPress={() => router.push('/tasks')}
         />
+        
+        <View className="mt-3">
+          <Button
+            title="Crear Nueva Tarea"
+            onPress={() => router.push('/tasks/new')}
+            variant="secondary"
+          />
+        </View>
       </View>
     </View>
   );
