@@ -4,8 +4,10 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useTasks } from '../../hooks/useTasks';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { TaskFormData, ValidationErrors } from '../../types';
+import AISuggestionModal from '../../components/AISuggestionModal';
+import { TaskFormData, ValidationErrors, AISuggestion } from '../../types';
 import { validateTaskForm } from '../../lib/validation';
+import { suggestTaskImprovements, isAIConfigured } from '../../lib/ai';
 
 export default function TaskDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,6 +19,9 @@ export default function TaskDetail() {
     description: '',
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<AISuggestion | null>(null);
 
   const task = getTask(id as string);
 
@@ -57,6 +62,56 @@ export default function TaskDetail() {
         { text: 'Eliminar', style: 'destructive', onPress: onConfirm }
       ]);
     }
+  };
+
+  const handleAISuggest = async () => {
+    if (!formData.title.trim() || formData.title.trim().length < 3) {
+      showAlert(
+        '⚠️ Información insuficiente',
+        'Por favor escribe al menos un título de 3 caracteres para que la IA pueda ayudarte.'
+      );
+      return;
+    }
+
+    if (!isAIConfigured()) {
+      showAlert(
+        '⚠️ IA no configurada',
+        'La API Key de Gemini no está configurada. Por favor contacta al administrador.'
+      );
+      return;
+    }
+
+    setAiLoading(true);
+
+    try {
+      const suggestion = await suggestTaskImprovements(
+        formData.title,
+        formData.description || 'Sin descripción'
+      );
+      
+      setAiSuggestion(suggestion);
+      setShowSuggestions(true);
+    } catch (error) {
+      showAlert(
+        '❌ Error de IA',
+        error instanceof Error ? error.message : 'No se pudieron generar sugerencias'
+      );
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleApplySuggestion = (suggestion: AISuggestion) => {
+    setFormData({
+      title: suggestion.improvedTitle,
+      description: suggestion.improvedDescription,
+    });
+    setErrors({});
+    setShowSuggestions(false);
+    showAlert(
+      '✅ Sugerencias aplicadas',
+      'La IA ha mejorado tu tarea. Puedes editarla antes de guardar si lo deseas.'
+    );
   };
 
   const handleUpdate = async () => {
@@ -219,7 +274,7 @@ export default function TaskDetail() {
               }
             }}
             error={errors.title}
-            editable={loading !== 'loading'}
+            editable={loading !== 'loading' && !aiLoading}
           />
 
           <Input
@@ -234,14 +289,28 @@ export default function TaskDetail() {
             }}
             error={errors.description}
             multiline
-            editable={loading !== 'loading'}
+            editable={loading !== 'loading' && !aiLoading}
           />
+
+          {/* Botón de IA */}
+          <View className="mb-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4">
+            <Text className="text-gray-700 text-sm mb-3">
+              💡 ¿Necesitas ayuda? La IA puede mejorar tu tarea
+            </Text>
+            <Button
+              title={aiLoading ? "⏳ Consultando IA..." : "✨ Sugerir con IA"}
+              onPress={handleAISuggest}
+              loading={aiLoading}
+              disabled={loading === 'loading'}
+            />
+          </View>
 
           <View className="mt-4">
             <Button
               title="Guardar Cambios"
               onPress={handleUpdate}
               loading={loading === 'loading'}
+              disabled={aiLoading}
             />
           </View>
 
@@ -260,11 +329,19 @@ export default function TaskDetail() {
                 }
               }}
               variant="secondary"
-              disabled={loading === 'loading'}
+              disabled={loading === 'loading' || aiLoading}
             />
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal de sugerencias de IA */}
+      <AISuggestionModal
+        visible={showSuggestions}
+        suggestion={aiSuggestion}
+        onApply={handleApplySuggestion}
+        onClose={() => setShowSuggestions(false)}
+      />
     </KeyboardAvoidingView>
   );
 }
