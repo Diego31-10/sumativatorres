@@ -5,6 +5,7 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { TaskFormData, ValidationErrors } from '../../types';
 import { validateTaskForm } from '../../lib/validation';
+import { createTask } from '../../lib/api';
 
 export default function NewTask() {
   const [formData, setFormData] = useState<TaskFormData>({
@@ -15,7 +16,7 @@ export default function NewTask() {
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validar formulario
     const validationErrors = validateTaskForm(formData);
     
@@ -26,31 +27,39 @@ export default function NewTask() {
 
     // Limpiar errores
     setErrors({});
-    
-    // Simular guardado (por ahora solo mostramos alerta)
     setLoading(true);
     
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // Crear tarea en la API
+      const newTask = await createTask(formData);
+      
       Alert.alert(
-        'Tarea creada',
-        `Título: ${formData.title}\nDescripción: ${formData.description}`,
+        '✅ Tarea creada exitosamente',
+        `"${newTask.title}" ha sido agregada.`,
         [
           {
             text: 'OK',
             onPress: () => {
-              // Limpiar formulario
-              setFormData({ title: '', description: '' });
+              // Navegar al home (luego será a la lista de tareas)
+              router.push('/');
             }
           }
         ]
       );
-    }, 1000);
+    } catch (error) {
+      Alert.alert(
+        '❌ Error',
+        error instanceof Error ? error.message : 'No se pudo crear la tarea',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'web' ? 'padding' : 'height'}
       className="flex-1"
     >
       <ScrollView className="flex-1 bg-gray-50">
@@ -65,12 +74,12 @@ export default function NewTask() {
             value={formData.title}
             onChangeText={(text) => {
               setFormData({ ...formData, title: text });
-              // Limpiar error al escribir
               if (errors.title) {
                 setErrors({ ...errors, title: undefined });
               }
             }}
             error={errors.title}
+            editable={!loading}
           />
 
           <Input
@@ -79,13 +88,13 @@ export default function NewTask() {
             value={formData.description}
             onChangeText={(text) => {
               setFormData({ ...formData, description: text });
-              // Limpiar error al escribir
               if (errors.description) {
                 setErrors({ ...errors, description: undefined });
               }
             }}
             error={errors.description}
             multiline
+            editable={!loading}
           />
 
           <View className="mt-4">
