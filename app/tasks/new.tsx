@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import Input from '../../components/ui/Input';
@@ -15,6 +15,23 @@ export default function NewTask() {
   
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [loading, setLoading] = useState(false);
+
+  const showAlert = (title: string, message: string, onOk?: () => void) => {
+    if (Platform.OS === 'web') {
+      // En web usar alert nativo del navegador
+      alert(`${title}\n\n${message}`);
+      if (onOk) onOk();
+    } else {
+      // En móvil usar Alert de React Native
+      const { Alert } = require('react-native');
+      Alert.alert(title, message, [
+        {
+          text: 'OK',
+          onPress: onOk
+        }
+      ]);
+    }
+  };
 
   const handleSubmit = async () => {
     // Validar formulario
@@ -33,24 +50,20 @@ export default function NewTask() {
       // Crear tarea en la API
       const newTask = await createTask(formData);
       
-      Alert.alert(
+      showAlert(
         '✅ Tarea creada exitosamente',
         `"${newTask.title}" ha sido agregada.`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navegar al home (luego será a la lista de tareas)
-              router.push('/');
-            }
-          }
-        ]
+        () => {
+          // Limpiar formulario y navegar
+          setFormData({ title: '', description: '' });
+          router.push('/');
+        }
       );
+      
     } catch (error) {
-      Alert.alert(
+      showAlert(
         '❌ Error',
-        error instanceof Error ? error.message : 'No se pudo crear la tarea',
-        [{ text: 'OK' }]
+        error instanceof Error ? error.message : 'No se pudo crear la tarea'
       );
     } finally {
       setLoading(false);
@@ -59,7 +72,7 @@ export default function NewTask() {
 
   return (
     <KeyboardAvoidingView 
-      behavior={Platform.OS === 'web' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       className="flex-1"
     >
       <ScrollView className="flex-1 bg-gray-50">
