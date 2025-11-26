@@ -18,3 +18,20 @@ export interface Task {
     title?: string;
     description?: string;
   }
+
+  export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+
+  export interface TasksContextType {
+    // Estado
+    tasks: Task[];
+    loading: LoadingState;
+    error: string | null;
+    
+    // Acciones
+    fetchTasks: () => Promise<void>;
+    addTask: (taskData: TaskFormData) => Promise<Task>;
+    updateTask: (id: string, taskData: Partial<Task>) => Promise<Task>;
+    removeTask: (id: string) => Promise<void>;
+    toggleTask: (id: string) => Promise<void>;
+    getTask: (id: string) => Task | undefined;
+  }

@@ -5,24 +5,23 @@ import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { TaskFormData, ValidationErrors } from '../../types';
 import { validateTaskForm } from '../../lib/validation';
-import { createTask } from '../../lib/api';
+import { useTasks } from '../../hooks/useTasks';
 
 export default function NewTask() {
+  const { addTask, loading } = useTasks();
+  
   const [formData, setFormData] = useState<TaskFormData>({
     title: '',
     description: '',
   });
   
   const [errors, setErrors] = useState<ValidationErrors>({});
-  const [loading, setLoading] = useState(false);
 
   const showAlert = (title: string, message: string, onOk?: () => void) => {
     if (Platform.OS === 'web') {
-      // En web usar alert nativo del navegador
       alert(`${title}\n\n${message}`);
       if (onOk) onOk();
     } else {
-      // En móvil usar Alert de React Native
       const { Alert } = require('react-native');
       Alert.alert(title, message, [
         {
@@ -44,11 +43,10 @@ export default function NewTask() {
 
     // Limpiar errores
     setErrors({});
-    setLoading(true);
     
     try {
-      // Crear tarea en la API
-      const newTask = await createTask(formData);
+      // Crear tarea usando el contexto
+      const newTask = await addTask(formData);
       
       showAlert(
         '✅ Tarea creada exitosamente',
@@ -65,8 +63,6 @@ export default function NewTask() {
         '❌ Error',
         error instanceof Error ? error.message : 'No se pudo crear la tarea'
       );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -92,7 +88,7 @@ export default function NewTask() {
               }
             }}
             error={errors.title}
-            editable={!loading}
+            editable={loading !== 'loading'}
           />
 
           <Input
@@ -107,14 +103,14 @@ export default function NewTask() {
             }}
             error={errors.description}
             multiline
-            editable={!loading}
+            editable={loading !== 'loading'}
           />
 
           <View className="mt-4">
             <Button
               title="Crear Tarea"
               onPress={handleSubmit}
-              loading={loading}
+              loading={loading === 'loading'}
             />
           </View>
 
@@ -123,7 +119,7 @@ export default function NewTask() {
               title="Cancelar"
               onPress={() => router.back()}
               variant="secondary"
-              disabled={loading}
+              disabled={loading === 'loading'}
             />
           </View>
         </View>
