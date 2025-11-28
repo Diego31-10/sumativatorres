@@ -37,6 +37,7 @@ export const getTaskById = async (id: string): Promise<Task> => {
  */
 export const createTask = async (taskData: TaskFormData): Promise<Task> => {
   const newTask = {
+    id: String(Date.now()), 
     ...taskData,
     completed: false,
     createdAt: new Date().toISOString(),

@@ -1,25 +1,11 @@
 {
   "tasks": [
     {
-      "id": "1",
-      "title": "Completar proyecto de React Native",
-      "description": "Terminar la aplicacion TaskFlow AI con todas las funcionalidades requeridas",
+      "id": "1764298079551",
+      "title": "ewerqwerqwerqwerqw",
+      "description": "erqwerqwerqwerqwerq",
       "completed": false,
-      "createdAt": "2024-01-15T10:00:00.000Z"
-    },
-    {
-      "id": "2",
-      "title": "Estudiar para el examen",
-      "description": "Repasar los capitulos 5 al 8 del libro de programacion movil",
-      "completed": false,
-      "createdAt": "2024-01-16T14:30:00.000Z"
-    },
-    {
-      "id": "3",
-      "title": "Hacer compras del supermercado",
-      "description": "Comprar leche pan huevos frutas y verduras para la semana",
-      "completed": true,
-      "createdAt": "2024-01-14T09:15:00.000Z"
+      "createdAt": "2025-11-28T02:47:59.551Z"
     }
   ]
 }
