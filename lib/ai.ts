@@ -19,7 +19,7 @@ export async function suggestTaskImprovements(
 ): Promise<AISuggestion> {
   try {
     // Obtener el modelo Gemini Pro
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
 
     // Crear el prompt para Gemini
     const prompt = `
@@ -33,12 +33,26 @@ DESCRIPCIÓN: "${description}"
 Tu trabajo es ayudar a mejorar esta tarea proporcionando:
 
 1. **Título mejorado**: Un título más claro, conciso y accionable (máximo 50 caracteres)
-2. **Descripción mejorada**: Una descripción más detallada, estructurada y útil (máximo 200 caracteres)
-3. **Subtareas sugeridas**: Una lista de 3-5 subtareas específicas que ayuden a completar la tarea principal
-4. **Razonamiento**: Una breve explicación de por qué hiciste estas sugerencias
+2. **Descripción mejorada**: Una descripción detallada que incluya el contexto principal y una lista numerada de subtareas específicas al final (máximo 300 caracteres)
+3. **Razonamiento**: Una breve explicación de por qué hiciste estas sugerencias
+
+FORMATO DE LA DESCRIPCIÓN:
+- Primero escribe un párrafo con el contexto general de la tarea
+- Luego agrega un salto de línea doble
+- Después agrega "Subtareas:" seguido de salto de línea
+- Lista las subtareas numeradas (1., 2., 3., etc.)
+
+EJEMPLO DE DESCRIPCIÓN MEJORADA:
+"Realizar las compras semanales del hogar incluyendo alimentos frescos y productos de limpieza
+
+Subtareas:
+1. Revisar despensa y hacer lista
+2. Verificar ofertas del supermercado
+3. Realizar las compras
+4. Organizar productos en casa"
 
 REGLAS IMPORTANTES:
-- Usa solo letras, números y espacios (sin caracteres especiales como @#$%&*)
+- Usa solo letras, números, espacios, puntos, comas y saltos de línea
 - Mantén un tono profesional pero amigable
 - Las subtareas deben ser accionables y específicas
 - Si el título/descripción original ya es bueno, haz mejoras sutiles
@@ -46,8 +60,7 @@ REGLAS IMPORTANTES:
 Responde ÚNICAMENTE en formato JSON válido con esta estructura exacta:
 {
   "improvedTitle": "tu título mejorado aquí",
-  "improvedDescription": "tu descripción mejorada aquí",
-  "subtasks": ["subtarea 1", "subtarea 2", "subtarea 3"],
+  "improvedDescription": "tu descripción mejorada aquí con subtareas incluidas",
   "reasoning": "tu explicación breve aquí"
 }
 
@@ -68,13 +81,14 @@ NO agregues texto adicional fuera del JSON. Solo el JSON puro.
     if (
       !suggestion.improvedTitle ||
       !suggestion.improvedDescription ||
-      !Array.isArray(suggestion.subtasks) ||
       !suggestion.reasoning
     ) {
       throw new Error('Respuesta de IA inválida');
     }
 
+    // Retornar la sugerencia
     return suggestion;
+
   } catch (error) {
     console.error('Error al generar sugerencias con IA:', error);
     

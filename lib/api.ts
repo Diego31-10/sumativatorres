@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Task, TaskFormData } from '../types';
 
 // URL de la API - cambiar según el dispositivo
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'https://3000-firebase-sumativatorres-1764016185024.cluster-lqzyk3r5hzdcaqv6zwm7wv6pwa.cloudworkstations.dev';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

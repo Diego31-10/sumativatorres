@@ -62,29 +62,16 @@ export default function AISuggestionModal({
               </View>
             </View>
 
-            {/* Descripción mejorada */}
+            {/* Descripción mejorada (ya incluye subtareas) */}
             <View className="mb-6">
               <Text className="text-gray-700 font-semibold mb-2">
-                📄 Descripción sugerida:
+                📄 Descripción mejorada (incluye subtareas):
               </Text>
               <View className="bg-gray-50 rounded-lg p-4">
                 <Text className="text-gray-800 leading-6">
                   {suggestion.improvedDescription}
                 </Text>
               </View>
-            </View>
-
-            {/* Subtareas */}
-            <View className="mb-6">
-              <Text className="text-gray-700 font-semibold mb-2">
-                ✅ Subtareas sugeridas:
-              </Text>
-              {suggestion.subtasks.map((subtask, index) => (
-                <View key={index} className="flex-row items-start mb-2">
-                  <Text className="text-blue-600 mr-2">{index + 1}.</Text>
-                  <Text className="flex-1 text-gray-800">{subtask}</Text>
-                </View>
-              ))}
             </View>
 
             {/* Botones */}
