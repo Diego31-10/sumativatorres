@@ -13,7 +13,7 @@ Una aplicación móvil moderna desarrollada con React Native y Expo que combina 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-[Características](#-características-principales) • [Capturas](#-capturas-de-pantalla) • [Tecnologías](#%EF%B8%8F-tecnologías-utilizadas) • [Arquitectura](#-arquitectura-del-proyecto) • [Autor](-autor)
+[Características](#-características-principales) • [Capturas](#-capturas-de-pantalla) • [Tecnologías](#%EF%B8%8F-tecnologías-utilizadas) • [Arquitectura](#-arquitectura-del-proyecto) • [Video](#%EF%B8%8Fvideo-explicativo) • [Autor](#%E2%80%8D-autor)
 
 </div>
 
@@ -189,6 +189,7 @@ TaskFlowAI/
 - **File-based Routing**: Enrutamiento intuitivo con Expo Router
 
 ---
+
 ## 📽️Video explicativo
 
 <div align="left">
@@ -201,6 +202,7 @@ TaskFlowAI/
 </div>
 
 ---
+
 ## 👨‍💻 Autor
 
 **Diego Torres**
