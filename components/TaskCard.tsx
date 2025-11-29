@@ -1,6 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native';
+import { CheckCircle2, Circle, ChevronRight } from 'lucide-react-native';
 import { Task } from '../types';
 import { router } from 'expo-router';
+import { useTheme } from '../hooks/useTheme';
 
 interface TaskCardProps {
   task: Task;
@@ -8,12 +10,13 @@ interface TaskCardProps {
 }
 
 export default function TaskCard({ task, onToggle }: TaskCardProps) {
+  const { theme } = useTheme();
+
   const handlePress = () => {
     router.push(`/tasks/${task.id}`);
   };
 
   const handleToggle = (e: any) => {
-    // Prevenir navegación al presionar el checkbox
     e.stopPropagation();
     onToggle(task.id);
   };
@@ -21,40 +24,49 @@ export default function TaskCard({ task, onToggle }: TaskCardProps) {
   return (
     <TouchableOpacity
       onPress={handlePress}
-      className="bg-white rounded-lg p-4 mb-3 shadow-sm border border-gray-200"
+      style={{
+        backgroundColor: theme.colors.surface,
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+      }}
       activeOpacity={0.7}
     >
-      <View className="flex-row items-start">
-        {/* Checkbox */}
-        <TouchableOpacity
-          onPress={handleToggle}
-          className={`w-6 h-6 rounded border-2 mr-3 items-center justify-center ${
-            task.completed ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
-          }`}
-        >
-          {task.completed && (
-            <Text className="text-white text-xs font-bold">✓</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+        {/* Checkbox con icono */}
+        <TouchableOpacity onPress={handleToggle} style={{ marginRight: 12 }}>
+          {task.completed ? (
+            <CheckCircle2 size={24} color={theme.colors.success} strokeWidth={2} />
+          ) : (
+            <Circle size={24} color={theme.colors.textSecondary} strokeWidth={2} />
           )}
         </TouchableOpacity>
 
         {/* Contenido */}
-        <View className="flex-1">
+        <View style={{ flex: 1 }}>
           <Text
-            className={`text-lg font-semibold ${
-              task.completed ? 'text-gray-400 line-through' : 'text-gray-800'
-            }`}
+            style={{
+              fontSize: 18,
+              fontWeight: '600',
+              color: task.completed ? theme.colors.textSecondary : theme.colors.text,
+              textDecorationLine: task.completed ? 'line-through' : 'none',
+            }}
           >
             {task.title}
           </Text>
           <Text
-            className={`text-sm mt-1 ${
-              task.completed ? 'text-gray-300' : 'text-gray-600'
-            }`}
+            style={{
+              fontSize: 14,
+              marginTop: 4,
+              color: theme.colors.textSecondary,
+            }}
             numberOfLines={2}
           >
             {task.description}
           </Text>
-          <Text className="text-xs text-gray-400 mt-2">
+          <Text style={{ fontSize: 12, color: theme.colors.textSecondary, marginTop: 8 }}>
             {new Date(task.createdAt).toLocaleDateString('es-ES', {
               day: '2-digit',
               month: 'short',
@@ -64,8 +76,8 @@ export default function TaskCard({ task, onToggle }: TaskCardProps) {
         </View>
 
         {/* Indicador visual */}
-        <View className="ml-2">
-          <Text className="text-gray-400 text-xl">›</Text>
+        <View style={{ marginLeft: 8 }}>
+          <ChevronRight size={20} color={theme.colors.textSecondary} />
         </View>
       </View>
     </TouchableOpacity>

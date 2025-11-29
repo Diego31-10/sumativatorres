@@ -1,4 +1,5 @@
 import { View, Text, TextInput, TextInputProps } from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
 
 interface InputProps extends TextInputProps {
   label: string;
@@ -12,23 +13,33 @@ export default function Input({
   multiline = false,
   ...props 
 }: InputProps) {
+  const { theme } = useTheme();
+
   return (
-    <View className="mb-4">
-      <Text className="text-gray-700 font-semibold mb-2">
+    <View style={{ marginBottom: 16 }}>
+      <Text style={{ color: theme.colors.text, fontWeight: '600', marginBottom: 8 }}>
         {label}
       </Text>
       <TextInput
-        className={`bg-white border ${
-          error ? 'border-red-500' : 'border-gray-300'
-        } rounded-lg px-4 py-3 text-gray-800`}
-        placeholderTextColor="#9ca3af"
+        style={{
+          backgroundColor: theme.colors.surface,
+          borderWidth: 1,
+          borderColor: error ? theme.colors.error : theme.colors.border,
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          color: theme.colors.text,
+          fontSize: 16,
+          minHeight: multiline ? 100 : 48,
+          textAlignVertical: multiline ? 'top' : 'center',
+        }}
+        placeholderTextColor={theme.colors.textSecondary}
         multiline={multiline}
         numberOfLines={multiline ? 4 : 1}
-        textAlignVertical={multiline ? 'top' : 'center'}
         {...props}
       />
       {error && (
-        <Text className="text-red-500 text-sm mt-1">
+        <Text style={{ color: theme.colors.error, fontSize: 14, marginTop: 4 }}>
           {error}
         </Text>
       )}

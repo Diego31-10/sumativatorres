@@ -1,31 +1,34 @@
 import { View, Text } from 'react-native';
 import { router } from 'expo-router';
+import { ListTodo, Plus } from 'lucide-react-native';
 import Button from '../components/ui/Button';
-import "@/global.css"
+import { useTheme } from '../hooks/useTheme';
 
 export default function Index() {
+  const { theme } = useTheme();
+
   return (
-    <View className="flex-1 items-center justify-center bg-gray-50 px-6">
-      <Text className="text-3xl font-bold text-blue-600 mb-2">
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.colors.background, paddingHorizontal: 24 }}>
+      <ListTodo size={80} color={theme.colors.primary} strokeWidth={1.5} />
+      
+      <Text style={{ fontSize: 32, fontWeight: 'bold', color: theme.colors.primary, marginTop: 16, marginBottom: 8 }}>
         TaskFlow AI
       </Text>
-      <Text className="text-gray-500 mb-8 text-center">
+      <Text style={{ fontSize: 16, color: theme.colors.textSecondary, marginBottom: 48, textAlign: 'center' }}>
         Gestión inteligente de tareas
       </Text>
       
-      <View className="w-full space-y-3">
+      <View style={{ width: '100%', gap: 12 }}>
         <Button
           title="Ver Mis Tareas"
           onPress={() => router.push('/tasks')}
         />
         
-        <View className="mt-3">
-          <Button
-            title="Crear Nueva Tarea"
-            onPress={() => router.push('/tasks/new')}
-            variant="secondary"
-          />
-        </View>
+        <Button
+          title="Crear Nueva Tarea"
+          onPress={() => router.push('/tasks/new')}
+          variant="secondary"
+        />
       </View>
     </View>
   );

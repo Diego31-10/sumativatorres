@@ -1,16 +1,19 @@
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
+import { Sparkles } from 'lucide-react-native';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import AISuggestionModal from '../../components/AISuggestionModal';
 import { TaskFormData, ValidationErrors, AISuggestion } from '../../types';
 import { validateTaskForm } from '../../lib/validation';
 import { useTasks } from '../../hooks/useTasks';
+import { useTheme } from '../../hooks/useTheme';
 import { suggestTaskImprovements, isAIConfigured } from '../../lib/ai';
 
 export default function NewTask() {
   const { addTask, loading } = useTasks();
+  const { theme } = useTheme();
   
   const [formData, setFormData] = useState<TaskFormData>({
     title: '',
@@ -38,19 +41,17 @@ export default function NewTask() {
   };
 
   const handleAISuggest = async () => {
-    // Validar que hay contenido mínimo
     if (!formData.title.trim() || formData.title.trim().length < 3) {
       showAlert(
-        '⚠️ Información insuficiente',
+        'Información insuficiente',
         'Por favor escribe al menos un título de 3 caracteres para que la IA pueda ayudarte.'
       );
       return;
     }
 
-    // Verificar configuración de IA
     if (!isAIConfigured()) {
       showAlert(
-        '⚠️ IA no configurada',
+        'IA no configurada',
         'La API Key de Gemini no está configurada. Por favor contacta al administrador.'
       );
       return;
@@ -68,7 +69,7 @@ export default function NewTask() {
       setShowSuggestions(true);
     } catch (error) {
       showAlert(
-        '❌ Error de IA',
+        'Error de IA',
         error instanceof Error ? error.message : 'No se pudieron generar sugerencias'
       );
     } finally {
@@ -77,27 +78,19 @@ export default function NewTask() {
   };
 
   const handleApplySuggestion = (suggestion: AISuggestion) => {
-    // Aplicar las sugerencias al formulario
     setFormData({
       title: suggestion.improvedTitle,
       description: suggestion.improvedDescription,
     });
-    
-    // Limpiar errores
     setErrors({});
-    
-    // Cerrar modal
     setShowSuggestions(false);
-    
-    // Mostrar confirmación
     showAlert(
-      '✅ Sugerencias aplicadas',
+      'Sugerencias aplicadas',
       'La IA ha mejorado tu tarea. Puedes editarla antes de guardar si lo deseas.'
     );
   };
 
   const handleSubmit = async () => {
-    // Validar formulario
     const validationErrors = validateTaskForm(formData);
     
     if (Object.keys(validationErrors).length > 0) {
@@ -105,18 +98,15 @@ export default function NewTask() {
       return;
     }
 
-    // Limpiar errores
     setErrors({});
     
     try {
-      // Crear tarea usando el contexto
       const newTask = await addTask(formData);
       
       showAlert(
-        '✅ Tarea creada exitosamente',
+        'Tarea creada exitosamente',
         `"${newTask.title}" ha sido agregada.`,
         () => {
-          // Limpiar formulario y navegar
           setFormData({ title: '', description: '' });
           router.push('/tasks');
         }
@@ -124,7 +114,7 @@ export default function NewTask() {
       
     } catch (error) {
       showAlert(
-        '❌ Error',
+        'Error',
         error instanceof Error ? error.message : 'No se pudo crear la tarea'
       );
     }
@@ -133,14 +123,11 @@ export default function NewTask() {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1"
+      style={{ flex: 1 }}
     >
-      <ScrollView className="flex-1 bg-gray-50">
-        <View className="p-6">
-          <Text className="text-2xl font-bold text-gray-800 mb-2">
-            Nueva Tarea
-          </Text>
-          <Text className="text-gray-600 mb-6">
+      <ScrollView style={{ flex: 1, backgroundColor: theme.colors.background }}>
+        <View style={{ padding: 24 }}>
+          <Text style={{ color: theme.colors.textSecondary, marginBottom: 24 }}>
             Escribe tu tarea y deja que la IA te ayude a mejorarla
           </Text>
 
@@ -159,7 +146,7 @@ export default function NewTask() {
           />
 
           <Input
-            label="Descripción (opcional)"
+            label="Descripción"
             placeholder="Ej: Comprar leche pan y huevos"
             value={formData.description}
             onChangeText={(text) => {
@@ -174,19 +161,29 @@ export default function NewTask() {
           />
 
           {/* Botón de IA */}
-          <View className="mb-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4">
-            <Text className="text-gray-700 text-sm mb-3">
-              💡 ¿Necesitas ayuda? La IA puede mejorar tu tarea y sugerir subtareas
-            </Text>
+          <View style={{ 
+            marginBottom: 16, 
+            backgroundColor: theme.colors.info + '10',
+            borderRadius: 12, 
+            padding: 16,
+            borderWidth: 1,
+            borderColor: theme.colors.info + '30'
+          }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+              <Sparkles size={20} color={theme.colors.info} strokeWidth={2} />
+              <Text style={{ color: theme.colors.text, fontSize: 14, marginLeft: 8 }}>
+                ¿Necesitas ayuda? La IA puede mejorar tu tarea
+              </Text>
+            </View>
             <Button
-              title={aiLoading ? "⏳ Consultando IA..." : "✨ Sugerir con IA"}
+              title={aiLoading ? "Consultando IA..." : "Sugerir con IA"}
               onPress={handleAISuggest}
               loading={aiLoading}
               disabled={loading === 'loading'}
             />
           </View>
 
-          <View className="mt-4">
+          <View style={{ marginTop: 16 }}>
             <Button
               title="Crear Tarea"
               onPress={handleSubmit}
@@ -195,7 +192,7 @@ export default function NewTask() {
             />
           </View>
 
-          <View className="mt-3">
+          <View style={{ marginTop: 12 }}>
             <Button
               title="Cancelar"
               onPress={() => router.back()}
@@ -206,7 +203,6 @@ export default function NewTask() {
         </View>
       </ScrollView>
 
-      {/* Modal de sugerencias de IA */}
       <AISuggestionModal
         visible={showSuggestions}
         suggestion={aiSuggestion}
